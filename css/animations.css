@@ -66,19 +66,51 @@
     }
 }
 
-@keyframes sparkle {
+/* New Magical Entrance */
+@keyframes magicalEntrance {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(50px) rotateX(20deg);
+        filter: blur(10px);
+    }
 
-    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotateX(0deg);
+        filter: blur(0);
+    }
+}
+
+/* New Magical Exit */
+@keyframes magicalExit {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+    }
+
     100% {
         opacity: 0;
-        transform: scale(0.5) rotate(0deg);
+        transform: scale(1.1) translateY(-30px);
+        filter: blur(5px);
+    }
+}
+
+/* Sound Bar Animation */
+@keyframes sound {
+    0% {
+        transform: scaleY(1);
     }
 
     50% {
-        opacity: 1;
-        transform: scale(1.2) rotate(180deg);
+        transform: scaleY(1.5);
+    }
+
+    100% {
+        transform: scaleY(1);
     }
 }
+
 
 /* Utility Classes for JS triggering */
 .animate-fade-in {
@@ -101,6 +133,16 @@
     animation: shake 0.5s ease-in-out;
 }
 
+.animate-float-in {
+    animation: magicalEntrance 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.animate-exit {
+    animation: magicalExit 0.8s ease-in forwards;
+}
+
+
+/* Delays */
 .delay-1 {
     animation-delay: 0.2s;
 }

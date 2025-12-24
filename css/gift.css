@@ -130,7 +130,6 @@
 .gift-box.open .side.top {
     transform: rotateX(210deg) translateZ(100px);
     opacity: 0;
-    /* Fade out lid for cleaner view of content if preferred or keep it */
     transition: transform 1.5s ease-in-out, opacity 1s ease 0.5s;
 }
 
@@ -158,19 +157,52 @@
     transition: transform 1s ease, opacity 0.5s ease 0.5s;
 }
 
-/* Floating content revealed */
+/* Story Mode Content Area */
 .gift-content {
     position: absolute;
-    top: 50%;
+    top: 55%;
+    /* Slightly lower to center better */
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 100%;
-    max-width: 600px;
+    width: 90%;
+    max-width: 500px;
+    /* Reduced width for better focus */
     z-index: 100;
-    /* Above box */
     display: none;
     /* Hidden by default */
     text-align: center;
+}
+
+.story-step {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+/* Ensure glass cards inside steps look good */
+.story-step .glass-card {
+    padding: 2rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.next-btn {
+    margin-top: 20px;
+    padding: 10px 25px;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    background: linear-gradient(135deg, var(--primary-gold), #d4ac0d);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);
+    transition: transform 0.2s;
+}
+
+.next-btn:hover {
+    transform: scale(1.05);
 }
 
 /* Envelopes and Cards */

@@ -73,6 +73,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- 3. Interaction Logic ---
     let isOpen = false;
+    let currentStep = 0;
+
+    // Attach nextStep to window for HTML onClick access
+    window.nextStep = (stepNumber) => {
+        const current = document.getElementById(`step${stepNumber - 1}`);
+        const next = document.getElementById(`step${stepNumber}`);
+
+        // 1. Exit current step
+        if (current) {
+            current.classList.remove('animate-float-in'); // Reset entrance
+            const card = current.querySelector('.glass-card') || current.querySelector('.envelope-container');
+            if (card) {
+                card.classList.add('animate-exit');
+            }
+
+            // Wait for exit animation then hide
+            setTimeout(() => {
+                current.style.display = 'none';
+
+                // 2. Enter next step
+                if (next) {
+                    next.style.display = 'block';
+                    // Trigger entrance animation on the inner card
+                    const nextCard = next.querySelector('.glass-card') || next.querySelector('.envelope-container');
+                    if (nextCard) {
+                        nextCard.classList.remove('animate-exit');
+                        nextCard.classList.add('animate-float-in');
+                    }
+                }
+            }, 600); // 0.6s exit duation match
+        }
+    };
 
     // Open Handler
     const handleOpen = () => {
@@ -91,24 +123,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             giftBox.classList.add('open');
             openBtn.style.opacity = 0;
 
-            // Fade out the container slightly to focus on content
-            document.getElementById('giftBoxContainer').style.opacity = '0.2';
-            document.getElementById('giftBoxContainer').style.pointerEvents = 'none';
+            // Fade out the container
+            const container = document.getElementById('giftBoxContainer');
+            container.style.transition = 'opacity 1s ease';
+            container.style.opacity = '0';
 
-            // 3. Reveal Content Sequence
-            giftContent.style.display = 'block'; // make visible first
+            setTimeout(() => {
+                container.style.display = 'none'; // Remove it flow
+            }, 1000);
 
-            // Animate items in one by one
-            const items = document.querySelectorAll('.sequence-item');
-            items.forEach((item, index) => {
-                setTimeout(() => {
-                    item.classList.add('animate-slide-up');
-                    item.style.opacity = 1; // Ensure it sticks
-                }, index * 800 + 1000); // Staggered delay
-            });
+            // 3. Start Story Mode Phase 1
+            giftContent.style.display = 'block';
 
-            // Snow & Confetti
-            startCelebration();
+            // Wait for box to disappear slightly then show Step 1
+            setTimeout(() => {
+                const step1 = document.getElementById('step1');
+                step1.style.display = 'block';
+                // Ensure animation runs
+                const card = step1.querySelector('.glass-card');
+                if (card) card.classList.add('animate-float-in');
+
+                // Confetti
+                startCelebration();
+            }, 800);
 
         }, 500);
     };
@@ -119,7 +156,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Envelope Logic
     if (envelope) {
         envelope.addEventListener('click', () => {
-            envelope.classList.toggle('open');
+            if (!envelope.classList.contains('open')) {
+                envelope.classList.add('open');
+                // Show the "Next" button after letter opens
+                setTimeout(() => {
+                    const btn = document.getElementById('btnToAudio');
+                    if (btn) {
+                        btn.style.display = 'inline-block';
+                        btn.style.opacity = 1;
+                    }
+                }, 1000);
+            }
         });
     }
 });
