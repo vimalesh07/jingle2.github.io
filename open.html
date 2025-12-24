@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Virtual Christmas Gift</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/gift.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/snowfall.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="open-page">
+    <div class="snowflakes" aria-hidden="true"></div>
+    
+    <div class="gift-message animate-fade-in">
+        <h1><i class="fas fa-gift"></i> A Gift For You</h1>
+        <p id="greeting">Click the gift box to open your present!</p>
+    </div>
+        
+        <div class="gift-container">
+        <!-- 3D Gift Box -->
+    <div class="gift-box" id="giftBox">
+        <div class="box">
+            <div class="side front"></div>
+            <div class="side back"></div>
+            <div class="side left"></div>
+            <div class="side right"></div>
+            <div class="side top">
+                <div class="ribbon"></div>
+                <div class="bow"></div>
+            </div>
+            <div class="side bottom"></div>
+        </div>
+    </div>
+
+    <!-- ... other content ... -->
+
+    <!-- Envelope with Letter -->
+    <div class="envelope-container sequence-item">
+        <h2><i class="fas fa-envelope"></i> A Personal Letter</h2>
+        <div class="envelope-wrapper" id="envelopeWrapper">
+            <div class="envelope" id="envelope">
+                <div class="envelope-back"></div>
+                <div class="envelope-front"></div>
+                <div class="envelope-flap"></div>
+                <div class="letter">
+                    <div class="letter-content" id="letterContent">
+                        <!-- Letter content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="envelope-instructions">Click the envelope to open the letter</p>
+    </div>
+        
+        <button id="openBtn" class="btn-primary animate-pulse">
+            <i class="fas fa-box-open"></i> Open Gift
+        </button>
+    </div>
+    
+    <!-- Gift Content (Hidden Initially) -->
+    <div class="gift-content" id="giftContent">
+        <!-- Photo Memory -->
+        <div class="photo-memory sequence-item">
+            <h2><i class="fas fa-image"></i> A Special Memory</h2>
+            <div class="photo-container" id="photoContainer">
+                <img id="giftPhoto" src="" alt="Special Memory">
+            </div>
+            <p class="photo-message" id="photoMessage"></p>
+        </div>
+        
+        
+        <!-- Voice Message -->
+        <div class="voice-message sequence-item">
+            <h2><i class="fas fa-microphone"></i> A Voice Message</h2>
+            <div class="voice-icon">
+                <i class="fas fa-volume-up"></i>
+            </div>
+            <p>A personal voice message from the sender</p>
+            <div class="voice-player">
+                <audio id="voiceAudio" controls>
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <button id="playVoiceBtn" class="btn-primary">
+                <i class="fas fa-play"></i> Play Message
+            </button>
+        </div>
+    </div>
+    
+    <div class="open-instructions animate-slide-up delay-2">
+        <p><i class="fas fa-mouse-pointer"></i> Click on each element to interact</p>
+        <p><i class="fas fa-volume-up"></i> Turn on sound for the best experience</p>
+    </div>
+    
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="music/bg.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <script src="js/openGift.js"></script>
+    <script src="js/snowfall.js"></script>
+    <script src="js/voice.js"></script>
+</body>
+</html>

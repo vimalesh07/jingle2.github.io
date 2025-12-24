@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a Virtual Christmas Gift</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/snowfall.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="create-page">
+    <div class="snowflakes" aria-hidden="true"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1 class="title animate-fade-in">
+                <i class="fas fa-gift"></i> Virtual Christmas Gift
+            </h1>
+            <p class="subtitle">Create a personalized digital gift for someone special</p>
+        </header>
+
+        <main class="create-form">
+            <div class="form-card animate-slide-up">
+                <h2><i class="fas fa-edit"></i> Personalize Your Gift</h2>
+                
+                <div class="form-group">
+                    <label for="recipientName"><i class="fas fa-user"></i> Recipient's Name</label>
+                    <input type="text" id="recipientName" placeholder="Enter recipient's name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="senderName"><i class="fas fa-user-circle"></i> Your Name</label>
+                    <input type="text" id="senderName" placeholder="Enter your name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="message"><i class="fas fa-envelope"></i> Personal Message</label>
+                    <textarea id="message" rows="4" placeholder="Write a heartfelt message..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="photo"><i class="fas fa-image"></i> Add a Photo (Optional)</label>
+                    <input type="file" id="photo" accept="image/*">
+                    <small>Upload a photo memory to include in the gift</small>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-microphone"></i> Voice Message (Optional)</label>
+                    <div class="voice-controls">
+                        <button id="recordBtn" class="btn-secondary">
+                            <i class="fas fa-microphone"></i> Record Message
+                        </button>
+                        <button id="stopBtn" class="btn-secondary" disabled>
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                    </div>
+                    <audio id="audioPreview" controls style="display: none;"></audio>
+                </div>
+
+                <div class="preview-section">
+                    <h3><i class="fas fa-eye"></i> Gift Preview</h3>
+                    <div class="gift-preview">
+                <div class="gift-preview">
+                    <!-- 3D Gift Box Preview -->
+                    <div class="gift-box">
+                        <div class="box">
+                            <div class="side front"></div>
+                            <div class="side back"></div>
+                            <div class="side left"></div>
+                            <div class="side right"></div>
+                            <div class="side top">
+                                <div class="ribbon-vertical"></div>
+                                <div class="ribbon-horizontal"></div>
+                                <div class="bow"></div>
+                            </div>
+                            <div class="side bottom"></div>
+                        </div>
+                    </div>
+                    <p class="preview-text">Click to see a preview!</p>
+                </div>
+                </div>
+
+                <div class="form-actions">
+                    <button id="createGiftBtn" class="btn-primary">
+                        <i class="fas fa-magic"></i> Create Gift
+                    </button>
+                    <button id="previewBtn" class="btn-secondary">
+                        <i class="fas fa-play"></i> Preview
+                    </button>
+                </div>
+            </div>
+
+            <div class="instructions animate-slide-up delay-1">
+                <h3><i class="fas fa-info-circle"></i> How It Works</h3>
+                <ol>
+                    <li>Fill in the gift details above</li>
+                    <li>Add a photo or voice message (optional)</li>
+                    <li>Create your gift and share the link</li>
+                    <li>The recipient will experience an interactive gift opening</li>
+                </ol>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Made with <i class="fas fa-heart" style="color: #e74c3c;"></i> for Christmas</p>
+        </footer>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Gift Created Successfully!</h2>
+            <p>Your virtual Christmas gift is ready to share.</p>
+            <div class="share-options">
+                <input type="text" id="giftLink" readonly>
+                <button id="copyLink" class="btn-secondary">
+                    <i class="fas fa-copy"></i> Copy Link
+                </button>
+            </div>
+            <button id="openGiftBtn" class="btn-primary">
+                <i class="fas fa-box-open"></i> Open Gift Now
+            </button>
+        </div>
+    </div>
+
+    <script src="js/createGift.js"></script>
+    <script src="js/snowfall.js"></script>
+    <script src="js/voice.js"></script>
+</body>
+</html>

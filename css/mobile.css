@@ -1,0 +1,73 @@
+@media (max-width: 1024px) {
+  .creator-shell {
+    padding-inline: 6vw;
+  }
+
+  .open-shell {
+    padding-inline: 6vw;
+  }
+}
+
+@media (max-width: 900px) {
+  .creator-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .summary-column {
+    order: -1;
+  }
+
+  .summary-card {
+    position: static;
+  }
+
+  .audio-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .top-bar {
+    padding-inline: 5vw;
+  }
+
+  .logo {
+    font-size: 1.05rem;
+    letter-spacing: 0.12em;
+  }
+
+  .creator-shell,
+  .open-shell {
+    padding-inline: 5vw;
+    padding-bottom: 2.1rem;
+  }
+
+  .box-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .scene {
+    padding-inline: 1.1rem;
+  }
+
+  .cinematic-box {
+    width: 160px;
+    height: 160px;
+  }
+}
+
+@media (max-width: 430px) {
+  .step-card,
+  .summary-card {
+    padding-inline: 1rem;
+  }
+
+  .photo-thumb {
+    width: 80px;
+    height: 80px;
+  }
+
+  .finale-copy {
+    font-size: 0.88rem;
+  }
+}
