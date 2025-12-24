@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             sender_name: "Preview User",
             receiver_name: "You",
             message: "This is a preview of your beautiful message. It will look just like this!",
-            photos: [], // Add dummy if needed
+            photos: ["https://images.unsplash.com/photo-1549465220-1a8b9238cd48?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"],
             voice_url: null
         };
         initGift(giftData);
@@ -48,7 +48,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             photoImg.src = data.photos[0];
             document.getElementById('photoMessage').innerText = "A captured moment...";
         } else {
-            document.querySelector('.photo-memory').style.display = 'none';
+            if (photoImg) photoImg.style.display = 'none';
+            const photoContainer = document.querySelector('.photo-container');
+            if (photoContainer) photoContainer.style.display = 'none';
         }
 
         // Setup Letter
@@ -67,87 +69,125 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (data.voice_url) {
             audio.src = data.voice_url;
         } else {
-            document.querySelector('.voice-message').style.display = 'none';
+            const voiceMsg = document.querySelector('.voice-message');
+            if (voiceMsg) voiceMsg.style.display = 'none';
         }
     }
 
     // --- 3. Interaction Logic ---
     let isOpen = false;
-    let currentStep = 0;
 
-    // Attach nextStep to window for HTML onClick access
+    // Ensure Initial State (Locked Closed)
+    gsap.set(".box-lid", {
+        y: 0,
+        rotationX: 0,
+        rotationZ: 0,
+        opacity: 1
+    });
+
+    // Handle Open: PRODUCTION READY ("Cinematic Dive")
+    const handleOpen = () => {
+        if (isOpen) return;
+        isOpen = true;
+
+        playMagicalSound();
+
+        // Master Timeline with high-quality easing
+        const tl = gsap.timeline();
+
+        // 1. Anticipation (Slight compression)
+        tl.to(".gift-box", {
+            scaleY: 0.95,
+            scaleX: 1.02,
+            duration: 0.2,
+            ease: "power2.out"
+        });
+
+        // 2. EXPLOSIVE Opening (Lid Flies, Box Recoils)
+        // Lid shoots off
+        tl.to(".box-lid", {
+            y: -600,
+            x: 200,
+            rotationX: 140,
+            rotationZ: 25,
+            opacity: 0,
+            duration: 1.2,
+            ease: "power3.inOut" // Distinctive "Throw" curve
+        }, "burst");
+
+        // Box snaps back and starts "Diving" (Scaling Up)
+        tl.to(".gift-box", {
+            scaleY: 1,
+            scaleX: 1,
+            duration: 0.1,
+            ease: "elastic.out(1, 0.5)"
+        }, "burst");
+
+        // 3. The "Dive Through" Transition (The Magic Glue)
+        // We scale the container UP towards the camera while fading it out
+        // This simulates moving INSIDE the box to reveal the content
+        tl.to("#giftBoxContainer", {
+            scale: 2.5,
+            opacity: 0,
+            filter: "blur(10px)", // Motion blur feel
+            duration: 1.5,
+            ease: "power2.inOut",
+            onComplete: () => {
+                const container = document.getElementById('giftBoxContainer');
+                if (container) container.style.display = 'none';
+            }
+        }, "-=0.8"); // Start overlapping with the lid flight
+
+        openBtn.style.opacity = 0;
+
+        // 4. Content Reveal (Emerges from the blur)
+        setTimeout(() => {
+            giftContent.style.display = 'block';
+            const step1 = document.getElementById('step1');
+            if (step1) {
+                step1.style.display = 'block';
+                const card = step1.querySelector('.glass-card');
+                if (card) {
+                    // Reset
+                    card.style.opacity = 0;
+                    card.style.transform = "scale(0.8) translateY(50px)"; // Start small & lower
+
+                    // Animate In (Counter-motion to the dive)
+                    gsap.to(card, {
+                        opacity: 1,
+                        scale: 1,
+                        y: 0,
+                        duration: 1.2,
+                        ease: "power3.out"
+                    });
+                }
+            }
+            startCelebration();
+        }, 800); // Trigger mid-dive
+    };
+
+    // Global Next Step
     window.nextStep = (stepNumber) => {
         const current = document.getElementById(`step${stepNumber - 1}`);
         const next = document.getElementById(`step${stepNumber}`);
 
-        // 1. Exit current step
         if (current) {
-            current.classList.remove('animate-float-in'); // Reset entrance
+            current.classList.remove('animate-float-in');
             const card = current.querySelector('.glass-card') || current.querySelector('.envelope-container');
-            if (card) {
-                card.classList.add('animate-exit');
-            }
+            if (card) card.classList.add('animate-exit');
 
-            // Wait for exit animation then hide
             setTimeout(() => {
                 current.style.display = 'none';
-
-                // 2. Enter next step
                 if (next) {
                     next.style.display = 'block';
-                    // Trigger entrance animation on the inner card
                     const nextCard = next.querySelector('.glass-card') || next.querySelector('.envelope-container');
                     if (nextCard) {
                         nextCard.classList.remove('animate-exit');
                         nextCard.classList.add('animate-float-in');
                     }
                 }
-            }, 600); // 0.6s exit duation match
+            }, 600);
         }
-    };
-
-    // Open Handler
-    const handleOpen = () => {
-        if (isOpen) return;
-        isOpen = true;
-
-        // Sound
-        playMagicalSound();
-
-        // 1. Shake Animation
-        giftBox.classList.add('animate-shake');
-
-        // 2. Open Box (after shake)
-        setTimeout(() => {
-            giftBox.classList.remove('animate-shake');
-            giftBox.classList.add('open');
-            openBtn.style.opacity = 0;
-
-            // Fade out the container
-            const container = document.getElementById('giftBoxContainer');
-            container.style.transition = 'opacity 1s ease';
-            container.style.opacity = '0';
-
-            setTimeout(() => {
-                container.style.display = 'none'; // Remove it flow
-            }, 1000);
-
-            // 3. Start Story Mode Phase 1
-            giftContent.style.display = 'block';
-
-            // Wait for box to disappear slightly then show Step 1
-            setTimeout(() => {
-                const step1 = document.getElementById('step1');
-                step1.style.display = 'block';
-                // Ensure animation runs
-                const card = step1.querySelector('.glass-card');
-                if (card) card.classList.add('animate-float-in');
-
-                // Confetti
-                startCelebration();
-            }, 800);
-
-        }, 500);
     };
 
     openBtn.addEventListener('click', handleOpen);
@@ -158,74 +198,64 @@ document.addEventListener('DOMContentLoaded', async () => {
         envelope.addEventListener('click', () => {
             if (!envelope.classList.contains('open')) {
                 envelope.classList.add('open');
-                // Show the "Next" button after letter opens
                 setTimeout(() => {
                     const btn = document.getElementById('btnToAudio');
                     if (btn) {
                         btn.style.display = 'inline-block';
                         btn.style.opacity = 1;
+                        gsap.from(btn, { y: 10, opacity: 0, duration: 0.4 });
                     }
-                }, 1000);
+                }, 800);
             }
         });
     }
 });
 
-// --- Audio Synthesis (No external assets needed) ---
 function playMagicalSound() {
     try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) return;
-
         const ctx = new AudioContext();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-
         osc.connect(gain);
         gain.connect(ctx.destination);
-
-        // Chime sound
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1); // Slide up
-
+        osc.frequency.setValueAtTime(400, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.2);
         gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
-
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.0);
         osc.start();
-        osc.stop(ctx.currentTime + 1.5);
-    } catch (e) {
-        console.warn("Audio Context error", e);
-    }
+        osc.stop(ctx.currentTime + 1.0);
+    } catch (e) { }
 }
 
 function startCelebration() {
-    // Uses the snowfall.js logic implicitly for snow, 
-    // adds confetti manually here
-    const colors = ['#f1c40f', '#e74c3c', '#2ecc71', '#3498db'];
-
-    // Burst of confetti
-    for (let i = 0; i < 100; i++) {
+    const colors = ['#e74c3c', '#f1c40f', '#2ecc71', '#3498db'];
+    for (let i = 0; i < 60; i++) {
         const div = document.createElement('div');
         div.className = 'confetti';
+        div.style.position = 'fixed';
+        div.style.width = '10px';
+        div.style.height = '10px';
         div.style.left = '50%';
         div.style.top = '50%';
         div.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        div.style.zIndex = '9999';
 
-        // Random velocity for "explosion"
         const angle = Math.random() * Math.PI * 2;
-        const velocity = Math.random() * 500 + 200; // pixels per sec equivalent
+        const velocity = Math.random() * 400 + 200;
         const tx = Math.cos(angle) * velocity;
         const ty = Math.sin(angle) * velocity;
 
-        div.style.transition = 'transform 1s ease-out, opacity 1s ease-in';
-        div.style.transform = `translate(${tx}px, ${ty}px)`;
+        div.style.transition = 'transform 1.0s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1s ease-in';
+        div.style.transform = `translate(${tx}px, ${ty}px) rotate(${Math.random() * 720}deg)`;
 
         document.body.appendChild(div);
 
         setTimeout(() => {
             div.style.opacity = 0;
             setTimeout(() => div.remove(), 1000);
-        }, 100); // Start moving immediately
+        }, 100);
     }
 }

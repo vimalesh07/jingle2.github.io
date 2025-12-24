@@ -28,21 +28,28 @@
             </p>
         </div>
 
-        <!-- 3D Gift Box Container -->
+        <!-- 3D Gift Box Container (Refactored for Base + Lid Logic) -->
         <div class="gift-container" id="giftBoxContainer">
             <div class="gift-box" id="giftBox">
-                <div class="box">
+
+                <!-- The Base (Stays put) -->
+                <div class="box-base">
                     <div class="side front"></div>
                     <div class="side back"></div>
                     <div class="side left"></div>
                     <div class="side right"></div>
+                    <div class="side bottom"></div>
+                </div>
+
+                <!-- The Lid (Animates separately) -->
+                <div class="box-lid">
                     <div class="side top">
                         <div class="ribbon-vertical"></div>
                         <div class="ribbon-horizontal"></div>
                         <div class="bow"></div>
                     </div>
-                    <div class="side bottom"></div>
                 </div>
+
             </div>
         </div>
 
@@ -136,6 +143,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="js/database.js" type="module"></script>
     <script src="js/snowfall.js"></script>
     <script src="js/voice.js" type="module"></script>

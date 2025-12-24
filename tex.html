@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>3D Rotating Gift Box with Bow</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:radial-gradient(circle at top,#1b2040,#070a1a);
+  overflow:hidden;
+}
+
+/* ===== SCENE ===== */
+.scene{
+  width:260px;
+  height:260px;
+  perspective:1000px;
+}
+
+/* ===== BOX ===== */
+.box{
+  width:200px;
+  height:200px;
+  position:relative;
+  transform-style:preserve-3d;
+  animation: spin 10s linear infinite;
+}
+
+/* ===== FACES ===== */
+.face{
+  position:absolute;
+  width:200px;
+  height:200px;
+  background:linear-gradient(135deg,#ff416c,#ff4b2b);
+  border:1px solid rgba(255,255,255,.15);
+}
+
+/* Cube positioning */
+.front  { transform:translateZ(100px); }
+.back   { transform:rotateY(180deg) translateZ(100px); }
+.right  { transform:rotateY(90deg)  translateZ(100px); }
+.left   { transform:rotateY(-90deg) translateZ(100px); }
+
+.top{
+  transform:rotateX(90deg) translateZ(100px);
+  background:linear-gradient(135deg,#ff6a00,#ee0979);
+}
+
+.bottom{
+  transform:rotateX(-90deg) translateZ(100px);
+  background:linear-gradient(135deg,#b31217,#240b36);
+}
+
+/* ===== RIBBONS ===== */
+.ribbon-v,.ribbon-h{
+  position:absolute;
+  background:rgba(255,255,255,.9);
+}
+
+.ribbon-v{
+  width:18px;
+  height:100%;
+  left:50%;
+  transform:translateX(-50%);
+}
+
+.ribbon-h{
+  height:18px;
+  width:100%;
+  top:50%;
+  transform:translateY(-50%);
+}
+
+/* ===== BOW / BELL STYLE ===== */
+.bow{
+  position:absolute;
+  width:44px;
+  height:44px;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+}
+
+.bow::before,
+.bow::after{
+  content:"";
+  position:absolute;
+  width:22px;
+  height:22px;
+  background:white;
+  border-radius:50%;
+  box-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+
+.bow::before{
+  left:0;
+}
+
+.bow::after{
+  right:0;
+}
+
+/* center bell */
+.bell{
+  position:absolute;
+  width:14px;
+  height:14px;
+  background:gold;
+  border-radius:50%;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 8px rgba(255,215,0,.8);
+}
+
+/* ===== ROTATION ===== */
+@keyframes spin{
+  from{ transform:rotateX(-25deg) rotateY(0deg); }
+  to  { transform:rotateX(-25deg) rotateY(360deg); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="scene">
+  <div class="box">
+
+    <div class="face front">
+      <div class="ribbon-v"></div><div class="ribbon-h"></div>
+    </div>
+
+    <div class="face back">
+      <div class="ribbon-v"></div><div class="ribbon-h"></div>
+    </div>
+
+    <div class="face right">
+      <div class="ribbon-v"></div><div class="ribbon-h"></div>
+    </div>
+
+    <div class="face left">
+      <div class="ribbon-v"></div><div class="ribbon-h"></div>
+    </div>
+
+    <div class="face top">
+      <div class="ribbon-v"></div>
+      <div class="ribbon-h"></div>
+      <div class="bow">
+        <div class="bell"></div>
+      </div>
+    </div>
+
+    <div class="face bottom"></div>
+
+  </div>
+</div>
+
+</body>
+</html>
