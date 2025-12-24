@@ -1,60 +1,33 @@
-/**
- * Lightweight Canvas Snowfall
- */
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.querySelector('.snowflakes');
+    if (!container) return;
 
-const canvas = document.getElementById('snow-canvas');
-const ctx = canvas.getContext('2d');
-
-let width, height;
-let snowflakes = [];
-
-function resize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-}
-
-class Snowflake {
-    constructor() {
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.5;
-        this.vy = Math.random() * 1 + 0.5;
-        this.size = Math.random() * 2 + 1;
-        this.opacity = Math.random() * 0.5 + 0.3;
+    // Create snowflakes
+    const COUNT = 50;
+    for (let i = 0; i < COUNT; i++) {
+        createSnowflake(container);
     }
+});
 
-    update() {
-        this.x += this.vx;
-        this.y += this.vy;
+function createSnowflake(container) {
+    const flake = document.createElement('div');
+    flake.classList.add('snowflake');
 
-        if (this.y > height) {
-            this.y = -10;
-            this.x = Math.random() * width;
-        }
-    }
+    // Randomize
+    const leftInit = Math.random() * 100 + 'vw';
+    const leftEnd = (Math.random() * 100 - 50 + parseFloat(leftInit)) + 'vw'; // Drift
+    const duration = Math.random() * 5 + 5 + 's'; // 5-10s
+    const delay = Math.random() * -10 + 's'; // Start at random times
+    const size = Math.random() * 5 + 2 + 'px';
+    const opacity = Math.random() * 0.5 + 0.3;
 
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-        ctx.fill();
-    }
+    flake.style.setProperty('--left-init', leftInit);
+    flake.style.setProperty('--left-end', leftEnd);
+    flake.style.width = size;
+    flake.style.height = size;
+    flake.style.opacity = opacity;
+    flake.style.animationDuration = duration;
+    flake.style.animationDelay = delay;
+
+    container.appendChild(flake);
 }
-
-function init() {
-    resize();
-    snowflakes = Array.from({ length: 50 }, () => new Snowflake());
-    loop();
-}
-
-function loop() {
-    ctx.clearRect(0, 0, width, height);
-    snowflakes.forEach(f => {
-        f.update();
-        f.draw();
-    });
-    requestAnimationFrame(loop);
-}
-
-window.addEventListener('resize', resize);
-init();

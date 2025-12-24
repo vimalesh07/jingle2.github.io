@@ -1,122 +1,184 @@
 import { db } from './database.js';
 
-// DOM Elements
-const stage = document.getElementById('main-stage');
-const loading = document.getElementById('loading');
-const errorMsg = document.getElementById('error-msg');
-const sceneBox = document.getElementById('scene-box');
-const sceneReveal = document.getElementById('scene-reveal');
+document.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    const giftId = params.get('id');
+    const isPreview = params.get('preview') === 'true';
 
-// Data Elements
-const receiverNameEl = document.getElementById('receiver-name');
-const senderNameEl = document.getElementById('sender-name');
-const messageTextEl = document.getElementById('message-text');
-const voicePlayer = document.getElementById('voice-player');
-const photoContainer = document.getElementById('photo-container');
-const voiceSection = document.getElementById('reveal-voice');
-const photoSection = document.getElementById('reveal-photo');
+    // Elements
+    const giftBox = document.getElementById('giftBox');
+    const openBtn = document.getElementById('openBtn');
+    const giftContent = document.getElementById('giftContent');
+    const greeting = document.getElementById('greeting');
+    const envelope = document.getElementById('envelope');
 
-// Extract Gift ID
-const urlParams = new URLSearchParams(window.location.search);
-const giftId = urlParams.get('giftId');
+    let giftData = null;
 
-async function loadGift() {
-    if (!giftId) {
-        showError();
-        return;
+    // --- 1. Load Data ---
+    if (isPreview) {
+        giftData = {
+            sender_name: "Preview User",
+            receiver_name: "You",
+            message: "This is a preview of your beautiful message. It will look just like this!",
+            photos: [], // Add dummy if needed
+            voice_url: null
+        };
+        initGift(giftData);
+    } else if (giftId) {
+        try {
+            giftData = await db.getGift(giftId);
+            initGift(giftData);
+        } catch (error) {
+            console.error(error);
+            greeting.innerText = "Gift not found or expired.";
+            openBtn.style.display = 'none';
+        }
+    } else {
+        greeting.innerText = "No gift ID provided.";
+        openBtn.style.display = 'none';
     }
 
-    try {
-        const gift = await db.getGift(giftId);
-        if (!gift) throw new Error('Gift not found');
+    // --- 2. Initialize UI ---
+    function initGift(data) {
+        greeting.innerHTML = `From <strong>${data.sender_name}</strong> to <strong>${data.receiver_name}</strong>`;
 
-        // Populate Data
-        receiverNameEl.textContent = gift.receiver_name;
-        senderNameEl.textContent = gift.sender_name;
-        messageTextEl.textContent = gift.message || "A warm holiday greeting for you!";
-
-        // Handle Voice
-        if (gift.voice_url) {
-            voicePlayer.src = gift.voice_url;
+        // Setup Photo
+        const photoImg = document.getElementById('giftPhoto');
+        if (data.photos && data.photos.length > 0) {
+            photoImg.src = data.photos[0];
+            document.getElementById('photoMessage').innerText = "A captured moment...";
         } else {
-            voiceSection.style.display = 'none';
+            document.querySelector('.photo-memory').style.display = 'none';
         }
 
-        // Handle Photos
-        if (gift.photos && gift.photos.length > 0) {
-            gift.photos.forEach(url => {
-                const img = document.createElement('img');
-                img.src = url;
-                img.loading = 'lazy';
-                img.style.marginBottom = '1rem';
-                img.style.boxShadow = 'var(--shadow-elevation)';
-                photoContainer.appendChild(img);
+        // Setup Letter
+        const letterContent = document.getElementById('letterContent');
+        if (data.message) {
+            letterContent.innerHTML = `
+                <p><strong>Dear ${data.receiver_name},</strong></p>
+                <p>${data.message.replace(/\n/g, '<br>')}</p>
+                <br>
+                <p style="text-align: right;">With love,<br><strong>${data.sender_name}</strong></p>
+            `;
+        }
+
+        // Setup Voice
+        const audio = document.getElementById('voiceAudio');
+        if (data.voice_url) {
+            audio.src = data.voice_url;
+        } else {
+            document.querySelector('.voice-message').style.display = 'none';
+        }
+    }
+
+    // --- 3. Interaction Logic ---
+    let isOpen = false;
+
+    // Open Handler
+    const handleOpen = () => {
+        if (isOpen) return;
+        isOpen = true;
+
+        // Sound
+        playMagicalSound();
+
+        // 1. Shake Animation
+        giftBox.classList.add('animate-shake');
+
+        // 2. Open Box (after shake)
+        setTimeout(() => {
+            giftBox.classList.remove('animate-shake');
+            giftBox.classList.add('open');
+            openBtn.style.opacity = 0;
+
+            // Fade out the container slightly to focus on content
+            document.getElementById('giftBoxContainer').style.opacity = '0.2';
+            document.getElementById('giftBoxContainer').style.pointerEvents = 'none';
+
+            // 3. Reveal Content Sequence
+            giftContent.style.display = 'block'; // make visible first
+
+            // Animate items in one by one
+            const items = document.querySelectorAll('.sequence-item');
+            items.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.add('animate-slide-up');
+                    item.style.opacity = 1; // Ensure it sticks
+                }, index * 800 + 1000); // Staggered delay
             });
-        } else {
-            photoSection.style.display = 'none';
-        }
 
-        // Ready to start
-        loading.style.display = 'none';
-        sceneBox.style.display = 'flex'; // Box Scene
+            // Snow & Confetti
+            startCelebration();
 
-        // Mark as opened silently
-        db.markOpened(giftId).catch(console.error);
+        }, 500);
+    };
 
-    } catch (err) {
-        console.error(err);
-        showError();
+    openBtn.addEventListener('click', handleOpen);
+    giftBox.addEventListener('click', handleOpen);
+
+    // Envelope Logic
+    if (envelope) {
+        envelope.addEventListener('click', () => {
+            envelope.classList.toggle('open');
+        });
     }
-}
-
-function showError() {
-    loading.style.display = 'none';
-    errorMsg.style.display = 'block';
-}
-
-/**
- * Story Engine / Reveal Animation
- */
-const giftBox = document.getElementById('gift-box-trigger');
-
-giftBox.addEventListener('click', () => {
-    // 1. Animate Box Away (Zoom + Fade)
-    giftBox.style.transform = 'scale(5) rotate(10deg)';
-    giftBox.style.opacity = '0';
-
-    // Quick timeout to switch scenes
-    setTimeout(() => {
-        sceneBox.style.display = 'none';
-        sceneReveal.style.display = 'block';
-        playRevealSequence();
-    }, 500);
 });
 
-function playRevealSequence() {
-    const sequence = [
-        { id: 'reveal-sender', delay: 100 },
-        { id: 'reveal-message', delay: 800 },
-        { id: 'reveal-voice', delay: 1500 },
-        { id: 'reveal-photo', delay: 2200 }
-    ];
+// --- Audio Synthesis (No external assets needed) ---
+function playMagicalSound() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
 
-    sequence.forEach(item => {
-        const el = document.getElementById(item.id);
-        if (el && el.style.display !== 'none') {
-            setTimeout(() => {
-                el.classList.add('reveal-active');
-            }, item.delay);
-        }
-    });
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
 
-    // Auto-play voice if available (browser policy might block this if not triggered by exact click interaction chain, but we just clicked the box, so it MIGHT work on some browsers, else user plays it manually)
-    // Attempting auto-play after a delay
-    if (voicePlayer.src) {
-        setTimeout(() => {
-            voicePlayer.play().catch(() => console.log('Autoplay blocked - user must click play'));
-        }, 1800);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        // Chime sound
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1); // Slide up
+
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 1.5);
+    } catch (e) {
+        console.warn("Audio Context error", e);
     }
 }
 
-// Init
-loadGift();
+function startCelebration() {
+    // Uses the snowfall.js logic implicitly for snow, 
+    // adds confetti manually here
+    const colors = ['#f1c40f', '#e74c3c', '#2ecc71', '#3498db'];
+
+    // Burst of confetti
+    for (let i = 0; i < 100; i++) {
+        const div = document.createElement('div');
+        div.className = 'confetti';
+        div.style.left = '50%';
+        div.style.top = '50%';
+        div.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+        // Random velocity for "explosion"
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 500 + 200; // pixels per sec equivalent
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+
+        div.style.transition = 'transform 1s ease-out, opacity 1s ease-in';
+        div.style.transform = `translate(${tx}px, ${ty}px)`;
+
+        document.body.appendChild(div);
+
+        setTimeout(() => {
+            div.style.opacity = 0;
+            setTimeout(() => div.remove(), 1000);
+        }, 100); // Start moving immediately
+    }
+}

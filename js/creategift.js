@@ -1,123 +1,159 @@
 import { db } from './database.js';
-import { VoiceRecorder } from './voice.js';
 
-// DOM Elements
-const form = document.getElementById('create-gift-form');
-const recordBtn = document.getElementById('record-btn');
-const stopBtn = document.getElementById('stop-btn');
-const playBtn = document.getElementById('play-btn');
-const recordStatus = document.getElementById('record-status');
-const createBtn = document.getElementById('create-btn');
-const resultArea = document.getElementById('result-area');
-const shareLinkDisplay = document.getElementById('share-link');
-const copyBtn = document.getElementById('copy-btn');
-const previewLink = document.getElementById('preview-link');
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
+    const createBtn = document.getElementById('createGiftBtn');
+    const previewBtn = document.getElementById('previewBtn');
+    const previewBox = document.getElementById('previewBox');
+    const photoInput = document.getElementById('photo');
+    const successModal = document.getElementById('successModal');
+    const closeModal = document.querySelector('.close-modal');
+    const giftLinkInput = document.getElementById('giftLink');
+    const copyLinkBtn = document.getElementById('copyLink');
+    const openGiftBtn = document.getElementById('openGiftBtn');
 
-// State
-let voiceBlob = null;
-const recorder = new VoiceRecorder();
+    let giftPhotoUrl = null;
 
-/**
- * Voice Recording Handlers
- */
-recordBtn.addEventListener('click', async () => {
-    try {
-        await recorder.start();
-        recordBtn.style.display = 'none';
-        stopBtn.style.display = 'block';
-        playBtn.style.display = 'none';
-        recordStatus.textContent = 'Recording...';
-        recordStatus.style.color = 'var(--color-accent)';
-    } catch (err) {
-        console.error(err);
-        alert('Could not access microphone.');
-    }
-});
+    // --- 1. 3D Preview Interactivity ---
+    // Simple rotation on mouse move for "Live" feel
+    const container = document.querySelector('.gift-preview');
+    if (container) {
+        container.addEventListener('mousemove', (e) => {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
 
-stopBtn.addEventListener('click', async () => {
-    voiceBlob = await recorder.stop();
-    recordBtn.style.display = 'block';
-    stopBtn.style.display = 'none';
-    playBtn.style.display = 'block';
-    recordStatus.textContent = 'Recording saved!';
-    recordStatus.style.color = 'white';
-    recordBtn.textContent = '🎙️ Re-record';
-});
+            // Calculate rotation based on cursor position
+            const rotateX = -20 + (y / rect.height - 0.5) * 30; // -20deg base tilt
+            const rotateY = 45 + (x / rect.width - 0.5) * 60; // 45deg base rotation
 
-playBtn.addEventListener('click', () => {
-    recorder.playPreview();
-});
-
-/**
- * Form Submission
- */
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // UI Loading State
-    createBtn.disabled = true;
-    createBtn.textContent = 'Wrapping Gift... 🎁';
-    createBtn.style.opacity = '0.7';
-
-    try {
-        const sender = document.getElementById('sender').value;
-        const receiver = document.getElementById('receiver').value;
-        const message = document.getElementById('message').value;
-        const photoFile = document.getElementById('photo-upload').files[0];
-
-        // 1. Upload Assets if they exist
-        let voiceUrl = null;
-        let photoUrl = null;
-
-        // Generate a temporary ID or use a predictable path structure. 
-        // Better: let's use a timestamp + random string for path to avoid needing DB ID first.
-        const timestamp = Date.now();
-
-        if (voiceBlob) {
-            const path = `${timestamp}_voice.webm`;
-            voiceUrl = await db.uploadFile(voiceBlob, path);
-        }
-
-        if (photoFile) {
-            const path = `${timestamp}_${photoFile.name}`;
-            photoUrl = await db.uploadFile(photoFile, path);
-        }
-
-        // 2. Create Gift Record
-        const gift = await db.createGift({
-            senderName: sender,
-            receiverName: receiver,
-            message: message,
-            voiceUrl: voiceUrl
-            // music: 'default' // TODO: Add music selection later
+            if (previewBox) {
+                previewBox.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            }
         });
 
-        // 3. Link Photo if exists
-        if (photoUrl) {
-            await db.addPhotos(gift.id, [photoUrl]);
+        // Reset on mouse leave
+        container.addEventListener('mouseleave', () => {
+            if (previewBox) {
+                previewBox.style.transform = `rotateX(-20deg) rotateY(45deg)`;
+            }
+        });
+    }
+
+    // --- 2. Photo Upload Handling ---
+    photoInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Visual feedback
+        const originalLabel = photoInput.previousElementSibling.innerHTML;
+        photoInput.previousElementSibling.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+        try {
+            // Upload to Supabase Storage
+            const path = `photos/${Date.now()}_${file.name}`;
+            giftPhotoUrl = await db.uploadFile(file, path);
+
+            // Show success
+            photoInput.previousElementSibling.innerHTML = '<i class="fas fa-check"></i> Photo Added!';
+
+            // Note: In a real advanced app, we might map this texture to the box wrapper!
+            // For now, we just store it.
+        } catch (error) {
+            console.error('Upload failed:', error);
+            alert('Failed to upload photo. Please try again.');
+            photoInput.previousElementSibling.innerHTML = originalLabel;
+        }
+    });
+
+    // --- 3. Form Submission ---
+    createBtn.addEventListener('click', async () => {
+        // Validation
+        const recipient = document.getElementById('recipientName').value.trim();
+        const sender = document.getElementById('senderName').value.trim();
+        const message = document.getElementById('message').value.trim();
+
+        if (!recipient || !sender || !message) {
+            alert('Please fill in all required fields (Recipient, Name, Message).');
+            return;
         }
 
-        // 4. Success! Show Result
-        const url = `${window.location.origin}/open.html?giftId=${gift.id}`;
+        // Loading state
+        const originalText = createBtn.innerHTML;
+        createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+        createBtn.disabled = true;
 
-        form.style.display = 'none';
-        resultArea.style.display = 'block';
-        shareLinkDisplay.textContent = url;
-        previewLink.href = url;
+        try {
+            // Get voice URL if recorded (assuming voice.js exposes this)
+            const voiceUrl = window.currentVoiceUrl || null;
 
-    } catch (err) {
-        console.error('Error creating gift:', err);
-        // Show specific error to help user debug (likely missing table or bucket)
-        alert(`Error: ${err.message || err.error_description || JSON.stringify(err)}`);
+            // Create Gift in DB
+            const newGift = await db.createGift({
+                senderName: sender,
+                receiverName: recipient,
+                message: message,
+                voiceUrl: voiceUrl
+            });
 
-        createBtn.disabled = false;
-        createBtn.textContent = '🎁 Create Magic Link';
-        createBtn.style.opacity = '1';
+            // If photo exists, add it (using the separate table logic from db.js)
+            if (giftPhotoUrl) {
+                await db.addPhotos(newGift.id, [giftPhotoUrl]);
+            }
+
+            // Success! Generate Link
+            const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '').replace(/\/$/, '');
+            const shareUrl = `${baseUrl}/open.html?id=${newGift.id}`;
+
+            giftLinkInput.value = shareUrl;
+            successModal.style.display = 'block';
+
+            // Confetti Effect
+            createConfetti();
+
+        } catch (error) {
+            console.error('Creation error:', error);
+            alert('Something went wrong creating your gift. Please try again.');
+        } finally {
+            createBtn.innerHTML = originalText;
+            createBtn.disabled = false;
+        }
+    });
+
+    // --- 4. Modal Actions ---
+    closeModal.addEventListener('click', () => successModal.style.display = 'none');
+
+    copyLinkBtn.addEventListener('click', () => {
+        giftLinkInput.select();
+        document.execCommand('copy'); // Fallback
+        navigator.clipboard.writeText(giftLinkInput.value).then(() => {
+            const original = copyLinkBtn.innerHTML;
+            copyLinkBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => copyLinkBtn.innerHTML = original, 2000);
+        });
+    });
+
+    openGiftBtn.addEventListener('click', () => {
+        window.location.href = giftLinkInput.value;
+    });
+
+    // --- 5. Preview Mode ---
+    previewBtn.addEventListener('click', () => {
+        // Just opens the open page with dummy data or special flag
+        const url = 'open.html?preview=true';
+        window.open(url, '_blank');
+    });
+});
+
+// Helper for confetti
+function createConfetti() {
+    const colors = ['#e74c3c', '#f1c40f', '#2ecc71', '#3498db'];
+    for (let i = 0; i < 50; i++) {
+        const div = document.createElement('div');
+        div.className = 'confetti';
+        div.style.left = Math.random() * 100 + 'vw';
+        div.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        div.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 5000);
     }
-});
-
-copyBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(shareLinkDisplay.textContent);
-    copyBtn.textContent = 'Copied!';
-    setTimeout(() => copyBtn.textContent = 'Copy Link', 2000);
-});
+}

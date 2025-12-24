@@ -4,91 +4,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Special Gift For You</title>
-
+    <title>Your Virtual Christmas Gift</title>
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Outfit:wght@300;400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap"
         rel="stylesheet">
-
-    <!-- CSS -->
+    <!-- Styles -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/gift.css">
-    <link rel="stylesheet" href="css/animation.css">
+    <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/snowfall.css">
-    <link rel="stylesheet" href="css/mobile.css">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body>
-    <canvas id="snow-canvas"></canvas>
+<body class="open-page">
+    <div class="snowflakes" aria-hidden="true"></div>
 
-    <div class="app-container">
-        <main class="gift-view" id="main-stage">
+    <div class="container animate-fade-in" style="padding-top: 50px;">
+        <div class="gift-message">
+            <h1><i class="fas fa-gift"></i> A Gift For You</h1>
+            <p id="greeting" style="font-size: 1.2rem; margin-top: 10px;">Click the gift box to unwrap your surprise!
+            </p>
+        </div>
 
-            <!-- Loading State -->
-            <div id="loading" class="animate-pulse">
-                <p>Looking for your gift in the snow... ❄️</p>
-            </div>
-
-            <!-- Error State -->
-            <div id="error-msg" style="display: none; color: #ff6b6b;">
-                <h1>Oh no!</h1>
-                <p>We couldn't find this gift. It might have gotten lost in the blizzard.</p>
-            </div>
-
-            <!-- Scene 1: The Box -->
-            <div id="scene-box" style="display: none;">
-                <h1 style="font-family: var(--font-display); margin-bottom: 2rem;">For <span
-                        id="receiver-name">You</span></h1>
-                <p style="margin-bottom: 2rem; opacity: 0.8;">Tap to open</p>
-                <div class="gift-box animate-float" id="gift-box-trigger">
-                    <span style="font-size: 4rem;">🎁</span>
-                </div>
-            </div>
-
-            <!-- Scene 2: The Reveal (Content) -->
-            <div id="scene-reveal" style="display: none; width: 100%; text-align: left; padding-bottom: 3rem;">
-
-                <!-- Sender -->
-                <div class="reveal-item" id="reveal-sender">
-                    <p style="text-align: center; color: var(--color-accent); font-size: 0.9rem; margin-bottom: 1rem;">
-                        From <span id="sender-name" style="font-weight: bold;"></span></p>
-                </div>
-
-                <!-- Message -->
-                <div class="reveal-item" id="reveal-message">
-                    <div
-                        style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: var(--radius-md); border-left: 3px solid var(--color-accent); margin-bottom: 2rem;">
-                        <p id="message-text" style="font-size: 1.1rem; line-height: 1.6; white-space: pre-wrap;"></p>
+        <!-- 3D Gift Box Container -->
+        <div class="gift-container" id="giftBoxContainer">
+            <div class="gift-box" id="giftBox">
+                <div class="box">
+                    <div class="side front"></div>
+                    <div class="side back"></div>
+                    <div class="side left"></div>
+                    <div class="side right"></div>
+                    <div class="side top">
+                        <div class="ribbon-vertical"></div>
+                        <div class="ribbon-horizontal"></div>
+                        <div class="bow"></div>
                     </div>
-                </div>
-
-                <!-- Voice -->
-                <div class="reveal-item" id="reveal-voice" style="margin-bottom: 2rem; text-align: center;">
-                    <p style="margin-bottom: 0.5rem; opacity: 0.7; font-size: 0.9rem;">Voice Message</p>
-                    <audio id="voice-player" controls style="width: 100%; opacity: 0.9;"></audio>
-                </div>
-
-                <!-- Photo -->
-                <div class="reveal-item" id="reveal-photo">
-                    <div id="photo-container" style="display: flex; flex-direction: column; gap: 1rem;">
-                        <!-- Photos injected here -->
-                    </div>
-                </div>
-
-                <div style="margin-top: 4rem; text-align: center; opacity: 0.5;">
-                    <p style="font-size: 0.8rem;">Merry Christmas</p>
+                    <div class="side bottom"></div>
                 </div>
             </div>
+        </div>
 
-        </main>
+        <button id="openBtn" class="btn-primary animate-pulse" style="margin-top: 50px;">
+            <i class="fas fa-box-open"></i> Open Gift
+        </button>
     </div>
 
-    <!-- Logic -->
-    <script type="module" src="js/snowfall.js"></script>
-    <script type="module" src="js/opengift.js"></script>
+    <!-- Revealed Content Area -->
+    <div class="gift-content" id="giftContent">
+        <!-- 1. Photo Memory -->
+        <div class="photo-memory sequence-item glass-card">
+            <h2><i class="fas fa-camera"></i> A Special Memory</h2>
+            <div class="photo-container"
+                style="margin: 20px 0; border: 5px solid white; transform: rotate(-2deg); box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+                <img id="giftPhoto" src="" alt="Special Memory" style="max-width: 100%; display: block;">
+            </div>
+            <p class="photo-message" id="photoMessage" style="font-style: italic;"></p>
+        </div>
+
+        <!-- 2. Animated Envelope -->
+        <div class="envelope-container sequence-item" style="margin-top: 40px; perspective: 1000px;">
+            <div class="envelope-wrapper" id="envelopeWrapper">
+                <div class="envelope" id="envelope">
+                    <div class="envelope-flap"></div>
+                    <div class="letter">
+                        <div class="letter-content" id="letterContent" style="text-align: left;">
+                            <!-- Letter content injected via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="envelope-instructions" style="margin-top: 20px; font-size: 0.9rem;">Tap the envelope to read</p>
+        </div>
+
+        <!-- 3. Voice Message -->
+        <div class="voice-message sequence-item glass-card" style="margin-top: 40px;">
+            <h2><i class="fas fa-microphone"></i> Voice Message</h2>
+            <div class="voice-icon" style="font-size: 3rem; margin: 20px 0; color: var(--primary-gold);">
+                <i class="fas fa-volume-up"></i>
+            </div>
+            <p>Listen to a personal message:</p>
+            <audio id="voiceAudio" controls style="width: 100%; margin-top: 15px;"></audio>
+        </div>
+
+        <!-- 4. Footer Actions -->
+        <div class="actions sequence-item" style="margin-top: 50px;">
+            <button id="replayBtn" class="btn-secondary"><i class="fas fa-redo"></i> Replay</button>
+            <button id="createOwnBtn" class="btn-primary" onclick="window.location.href='index.html'"><i
+                    class="fas fa-magic"></i> Create Your Own</button>
+        </div>
+    </div>
+
+    <div class="open-instructions animate-slide-up delay-2"
+        style="position: fixed; bottom: 20px; width: 100%; text-align: center; font-size: 0.8rem; opacity: 0.7;">
+        <p><i class="fas fa-volume-up"></i> Turn on sound for the best experience</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/database.js" type="module"></script>
+    <script src="js/snowfall.js"></script>
+    <script src="js/voice.js"></script>
+    <script src="js/openGift.js" type="module"></script>
 </body>
 
 </html>

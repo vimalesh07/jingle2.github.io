@@ -1,60 +1,173 @@
 :root {
-  /* HSL Color Palette - Emotion & Premium Feel */
-  --hue-primary: 350; /* Christmas Red */
-  --hue-secondary: 145; /* Pine Green */
-  --hue-gold: 45; /* Gold/Magic */
-  
-  --color-bg: hsl(var(--hue-primary), 40%, 10%);
-  --color-text: hsl(0, 0%, 98%);
-  --color-accent: hsl(var(--hue-gold), 80%, 60%);
-  --color-surface: hsl(var(--hue-primary), 30%, 15%);
-  
-  --font-main: 'Outfit', sans-serif;
-  --font-display: 'Cinzel', serif;
-  
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  
-  --shadow-elevation: 0 10px 40px -10px rgba(0,0,0,0.5);
-  --glow-gold: 0 0 20px hsla(var(--hue-gold), 80%, 60%, 0.3);
+  /* Premium Color Palette */
+  --primary-red: #c0392b;
+  --primary-red-dark: #a93226;
+  --primary-gold: #f1c40f;
+  --light-gold: #f9e79f;
+  --dark-gold: #d4ac0d;
+  --snow-white: #ffffff;
+  --off-white: #f5f5f5;
+  --night-blue: #2c3e50;
+  --bg-gradient: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  /* Typography */
+  --font-heading: 'Dancing Script', cursive;
+  --font-body: 'Poppins', sans-serif;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 2rem;
+  --spacing-lg: 4rem;
+
+  /* Interactive */
+  --transition-fast: 0.3s ease;
+  --transition-smooth: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-main);
-  height: 100dvh; /* Mobile viewport fix */
-  overflow: hidden; /* App-like feel */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  -webkit-font-smoothing: antialiased;
-}
-
-img, video {
-  max-width: 100%;
-  border-radius: var(--radius-sm);
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  font-family: inherit;
-}
-
-.app-container {
-  width: 100%;
-  max-width: 480px; /* Mobile-first constraint */
-  height: 100%;
-  position: relative;
-  overflow-y: auto;
+  font-family: var(--font-body);
+  background: var(--bg-gradient);
+  color: var(--off-white);
+  min-height: 100vh;
   overflow-x: hidden;
-  background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-surface) 100%);
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--primary-gold);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition-fast);
+}
+
+/* Utilities */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-sm);
+  text-align: center;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: var(--spacing-md);
+  box-shadow: var(--glass-shadow);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-gold), var(--dark-gold));
+  color: var(--primary-red-dark);
+  border: none;
+  padding: 12px 30px;
+  font-size: 1.2rem;
+  font-family: var(--font-heading);
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(241, 196, 15, 0.6);
+}
+
+.btn-primary:disabled {
+  background: #7f8c8d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 2px solid var(--light-gold);
+  color: var(--light-gold);
+  padding: 10px 25px;
+  font-size: 1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background: rgba(241, 196, 15, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: var(--spacing-md);
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--light-gold);
+  font-size: 0.9rem;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: white;
+  font-family: var(--font-body);
+  transition: var(--transition-fast);
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary-gold);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(241, 196, 15, 0.2);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--night-blue);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--dark-gold);
+  border-radius: 4px;
 }

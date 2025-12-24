@@ -1,72 +1,230 @@
-/* Gift Box & Interactions */
-.gift-view {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: 2rem;
-    text-align: center;
+/* 3D Gift Box Layout */
+.gift-container {
+    perspective: 1000px;
+    width: 300px;
+    height: 300px;
+    margin: 50px auto;
+    position: relative;
+    z-index: 10;
 }
 
 .gift-box {
-    width: 200px;
-    height: 200px;
-    background: var(--color-accent);
-    border-radius: var(--radius-md);
+    width: 100%;
+    height: 100%;
     position: relative;
+    transform-style: preserve-3d;
+    transform: rotateX(-20deg) rotateY(45deg);
+    transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     cursor: pointer;
-    box-shadow: var(--glow-gold);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    display: grid;
-    place-items: center;
 }
 
 .gift-box:hover {
-    transform: scale(1.05) rotate(2deg);
+    transform: rotateX(-20deg) rotateY(45deg) scale(1.05);
 }
 
-.gift-input-group {
-    margin-bottom: 1.5rem;
+/* Box Sides */
+.box .side {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
+    left: 50px;
+    /* Centering helper */
+    top: 50px;
+}
+
+/* Positioning Sides */
+.side.front {
+    transform: translateZ(100px);
+}
+
+.side.back {
+    transform: rotateY(180deg) translateZ(100px);
+}
+
+.side.right {
+    transform: rotateY(90deg) translateZ(100px);
+}
+
+.side.left {
+    transform: rotateY(-90deg) translateZ(100px);
+}
+
+.side.top {
+    transform: rotateX(90deg) translateZ(100px);
+    transform-origin: bottom;
+    background: linear-gradient(135deg, #d35400, #c0392b);
+    /* Slightly brighter top */
+    z-index: 2;
+}
+
+.side.bottom {
+    transform: rotateX(-90deg) translateZ(100px);
+    box-shadow: 0 0 100px rgba(0, 0, 0, 0.8);
+}
+
+/* Ribbon and Bow */
+.ribbon-vertical,
+.ribbon-horizontal {
+    position: absolute;
+    background: linear-gradient(to right, #f1c40f, #f39c12, #f1c40f);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ribbon-vertical {
+    width: 30px;
+    height: 100%;
+    left: 85px;
+}
+
+/* Center 200px / 2 = 100 - 15 = 85 */
+.ribbon-horizontal {
     width: 100%;
-    text-align: left;
+    height: 30px;
+    top: 85px;
 }
 
-.gift-input-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    opacity: 0.8;
+.side.bottom .ribbon-vertical {
+    height: 100%;
 }
 
-.gift-input {
+/* The Bow */
+.bow {
+    position: absolute;
+    top: -40px;
+    left: 60px;
+    /* Center alignment tweaking */
+    width: 80px;
+    height: 40px;
+    z-index: 10;
+}
+
+.bow::before,
+.bow::after {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50% 50% 0 50%;
+    background: radial-gradient(circle at 30% 30%, #f1c40f, #d35400);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    top: 0;
+}
+
+.bow::before {
+    transform: rotate(45deg);
+    left: 0;
+}
+
+.bow::after {
+    transform: rotate(135deg) scaleX(-1);
+    right: 0;
+}
+
+/* Open Animation State */
+.gift-box.open .side.top {
+    transform: rotateX(210deg) translateZ(100px);
+    opacity: 0;
+    /* Fade out lid for cleaner view of content if preferred or keep it */
+    transition: transform 1.5s ease-in-out, opacity 1s ease 0.5s;
+}
+
+.gift-box.open .side.front {
+    transform: translateZ(100px) rotateX(-90deg);
+    opacity: 0;
+    transition: transform 1s ease, opacity 0.5s ease 0.5s;
+}
+
+.gift-box.open .side.left {
+    transform: rotateY(-90deg) translateZ(100px) rotateX(-90deg);
+    opacity: 0;
+    transition: transform 1s ease, opacity 0.5s ease 0.5s;
+}
+
+.gift-box.open .side.right {
+    transform: rotateY(90deg) translateZ(100px) rotateX(-90deg);
+    opacity: 0;
+    transition: transform 1s ease, opacity 0.5s ease 0.5s;
+}
+
+.gift-box.open .side.back {
+    transform: rotateY(180deg) translateZ(100px) rotateX(-90deg);
+    opacity: 0;
+    transition: transform 1s ease, opacity 0.5s ease 0.5s;
+}
+
+/* Floating content revealed */
+.gift-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 100%;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-sm);
-    color: white;
-    font-size: 1rem;
-    transition: border-color 0.2s;
+    max-width: 600px;
+    z-index: 100;
+    /* Above box */
+    display: none;
+    /* Hidden by default */
+    text-align: center;
 }
 
-.gift-input:focus {
-    outline: none;
-    border-color: var(--color-accent);
+/* Envelopes and Cards */
+.envelope {
+    width: 300px;
+    height: 200px;
+    background: #c0392b;
+    position: relative;
+    margin: 0 auto;
+    transition: var(--transition-smooth);
+    cursor: pointer;
+    transform-style: preserve-3d;
 }
 
-.btn-primary {
-    width: 100%;
-    padding: 1rem;
-    background: var(--color-accent);
-    color: var(--color-bg);
-    font-weight: 700;
-    border-radius: var(--radius-md);
-    font-size: 1.1rem;
-    box-shadow: var(--shadow-elevation);
-    transition: transform 0.2s;
+.envelope.open .envelope-flap {
+    transform: rotateX(180deg);
+    z-index: 0;
 }
 
-.btn-primary:active {
-    transform: scale(0.98);
+.envelope.open .letter {
+    transform: translateY(-100px);
+    z-index: 5;
+    opacity: 1;
+}
+
+.envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-top: 120px solid #a93226;
+    /* Darker red flap */
+    transform-origin: top;
+    transition: 0.6s ease;
+    z-index: 3;
+}
+
+.letter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 280px;
+    height: 180px;
+    background: #fff;
+    color: #333;
+    padding: 20px;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: 0.8s ease;
+    z-index: 1;
+    overflow-y: auto;
+    opacity: 0;
 }
