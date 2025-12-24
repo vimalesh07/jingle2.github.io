@@ -1,40 +1,27 @@
-// Simple ID + storage helpers
-function createGiftId() {
-  return "gift_" + Date.now().toString(36) + "_" +
-    Math.random().toString(16).slice(2);
+export function generateId() {
+  return crypto.randomUUID();
 }
 
-function saveGift(id, data) {
-  localStorage.setItem(id, JSON.stringify(data));
+/**
+ * Simple debounce function
+ */
+export function debounce(func, wait) {
+  let timeout;
+  return function initiated(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }
 
-function loadGift(id) {
-  const raw = localStorage.getItem(id);
-  return raw ? JSON.parse(raw) : null;
+/**
+ * Format time for audio player
+ */
+export function formatTime(seconds) {
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+  return `${min}:${sec < 10 ? '0' : ''}${sec}`;
 }
-
-function getGiftIdFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("id");
-}
-
-function copyToClipboard(text) {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).catch(() => {});
-  } else {
-    const t = document.createElement("textarea");
-    t.value = text;
-    document.body.appendChild(t);
-    t.select();
-    document.execCommand("copy");
-    document.body.removeChild(t);
-  }
-}
-
-window.JingleUtils = {
-  createGiftId,
-  saveGift,
-  loadGift,
-  getGiftIdFromUrl,
-  copyToClipboard
-};

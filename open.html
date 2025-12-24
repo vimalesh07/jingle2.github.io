@@ -1,106 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Virtual Christmas Gift</title>
+    <title>A Special Gift For You</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Outfit:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/gift.css">
-    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/animation.css">
     <link rel="stylesheet" href="css/snowfall.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/mobile.css">
 </head>
-<body class="open-page">
-    <div class="snowflakes" aria-hidden="true"></div>
-    
-    <div class="gift-message animate-fade-in">
-        <h1><i class="fas fa-gift"></i> A Gift For You</h1>
-        <p id="greeting">Click the gift box to open your present!</p>
-    </div>
-        
-        <div class="gift-container">
-        <!-- 3D Gift Box -->
-    <div class="gift-box" id="giftBox">
-        <div class="box">
-            <div class="side front"></div>
-            <div class="side back"></div>
-            <div class="side left"></div>
-            <div class="side right"></div>
-            <div class="side top">
-                <div class="ribbon"></div>
-                <div class="bow"></div>
+
+<body>
+    <canvas id="snow-canvas"></canvas>
+
+    <div class="app-container">
+        <main class="gift-view" id="main-stage">
+
+            <!-- Loading State -->
+            <div id="loading" class="animate-pulse">
+                <p>Looking for your gift in the snow... ❄️</p>
             </div>
-            <div class="side bottom"></div>
-        </div>
-    </div>
 
-    <!-- ... other content ... -->
+            <!-- Error State -->
+            <div id="error-msg" style="display: none; color: #ff6b6b;">
+                <h1>Oh no!</h1>
+                <p>We couldn't find this gift. It might have gotten lost in the blizzard.</p>
+            </div>
 
-    <!-- Envelope with Letter -->
-    <div class="envelope-container sequence-item">
-        <h2><i class="fas fa-envelope"></i> A Personal Letter</h2>
-        <div class="envelope-wrapper" id="envelopeWrapper">
-            <div class="envelope" id="envelope">
-                <div class="envelope-back"></div>
-                <div class="envelope-front"></div>
-                <div class="envelope-flap"></div>
-                <div class="letter">
-                    <div class="letter-content" id="letterContent">
-                        <!-- Letter content will be inserted here -->
-                    </div>
+            <!-- Scene 1: The Box -->
+            <div id="scene-box" style="display: none;">
+                <h1 style="font-family: var(--font-display); margin-bottom: 2rem;">For <span
+                        id="receiver-name">You</span></h1>
+                <p style="margin-bottom: 2rem; opacity: 0.8;">Tap to open</p>
+                <div class="gift-box animate-float" id="gift-box-trigger">
+                    <span style="font-size: 4rem;">🎁</span>
                 </div>
             </div>
-        </div>
-        <p class="envelope-instructions">Click the envelope to open the letter</p>
-    </div>
-        
-        <button id="openBtn" class="btn-primary animate-pulse">
-            <i class="fas fa-box-open"></i> Open Gift
-        </button>
-    </div>
-    
-    <!-- Gift Content (Hidden Initially) -->
-    <div class="gift-content" id="giftContent">
-        <!-- Photo Memory -->
-        <div class="photo-memory sequence-item">
-            <h2><i class="fas fa-image"></i> A Special Memory</h2>
-            <div class="photo-container" id="photoContainer">
-                <img id="giftPhoto" src="" alt="Special Memory">
+
+            <!-- Scene 2: The Reveal (Content) -->
+            <div id="scene-reveal" style="display: none; width: 100%; text-align: left; padding-bottom: 3rem;">
+
+                <!-- Sender -->
+                <div class="reveal-item" id="reveal-sender">
+                    <p style="text-align: center; color: var(--color-accent); font-size: 0.9rem; margin-bottom: 1rem;">
+                        From <span id="sender-name" style="font-weight: bold;"></span></p>
+                </div>
+
+                <!-- Message -->
+                <div class="reveal-item" id="reveal-message">
+                    <div
+                        style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: var(--radius-md); border-left: 3px solid var(--color-accent); margin-bottom: 2rem;">
+                        <p id="message-text" style="font-size: 1.1rem; line-height: 1.6; white-space: pre-wrap;"></p>
+                    </div>
+                </div>
+
+                <!-- Voice -->
+                <div class="reveal-item" id="reveal-voice" style="margin-bottom: 2rem; text-align: center;">
+                    <p style="margin-bottom: 0.5rem; opacity: 0.7; font-size: 0.9rem;">Voice Message</p>
+                    <audio id="voice-player" controls style="width: 100%; opacity: 0.9;"></audio>
+                </div>
+
+                <!-- Photo -->
+                <div class="reveal-item" id="reveal-photo">
+                    <div id="photo-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Photos injected here -->
+                    </div>
+                </div>
+
+                <div style="margin-top: 4rem; text-align: center; opacity: 0.5;">
+                    <p style="font-size: 0.8rem;">Merry Christmas</p>
+                </div>
             </div>
-            <p class="photo-message" id="photoMessage"></p>
-        </div>      
-        <!-- Voice Message -->
-        <div class="voice-message sequence-item">
-            <h2><i class="fas fa-microphone"></i> A Voice Message</h2>
-            <div class="voice-icon">
-                <i class="fas fa-volume-up"></i>
-            </div>
-            <p>A personal voice message from the sender</p>
-            <div class="voice-player">
-                <audio id="voiceAudio" controls>
-                    Your browser does not support the audio element.
-                </audio>
-            </div>
-            <button id="playVoiceBtn" class="btn-primary">
-                <i class="fas fa-play"></i> Play Message
-            </button>
-        </div>
+
+        </main>
     </div>
-    
-    <div class="open-instructions animate-slide-up delay-2">
-        <p><i class="fas fa-mouse-pointer"></i> Click on each element to interact</p>
-        <p><i class="fas fa-volume-up"></i> Turn on sound for the best experience</p>
-    </div>
-    
-    <!-- Background Music -->
-    <audio id="bgMusic" loop>
-        <source src="music/bg.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-    
-    <script src="js/opengift.js"></script>
-    <script src="js/snowfall.js"></script>
-    <script src="js/voice.js"></script>
+
+    <!-- Logic -->
+    <script type="module" src="js/snowfall.js"></script>
+    <script type="module" src="js/opengift.js"></script>
 </body>
+
 </html>

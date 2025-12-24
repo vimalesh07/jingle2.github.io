@@ -3,133 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create a Virtual Christmas Gift</title>
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/animations.css">
-    <link rel="stylesheet" href="css/snowfall.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="create-page">
-    <div class="snowflakes" aria-hidden="true"></div>
+    <title>Create Your Magic Gift</title>
     
-    <div class="container">
-        <header class="header">
-            <h1 class="title animate-fade-in">
-                <i class="fas fa-gift"></i> Virtual Christmas Gift
-            </h1>
-            <p class="subtitle">Create a personalized digital gift for someone special</p>
-        </header>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/gift.css">
+    <link rel="stylesheet" href="css/animation.css">
+    <link rel="stylesheet" href="css/snowfall.css">
+    <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+    <canvas id="snow-canvas"></canvas>
 
-        <main class="create-form">
-            <div class="form-card animate-slide-up">
-                <h2><i class="fas fa-edit"></i> Personalize Your Gift</h2>
-                
-                <div class="form-group">
-                    <label for="recipientName"><i class="fas fa-user"></i> Recipient's Name</label>
-                    <input type="text" id="recipientName" placeholder="Enter recipient's name" required>
+    <div class="app-container">
+        <main class="gift-view">
+            <h1 style="font-family: var(--font-display); margin-bottom: 2rem; color: var(--color-accent);">Wrap a Memory</h1>
+            
+            <form id="create-gift-form" onsubmit="event.preventDefault();">
+                <!-- Step 1: Who is it for? -->
+                <div class="gift-input-group animate-slide-up" style="animation-delay: 0.1s;">
+                    <label>To (Receiver Name)</label>
+                    <input type="text" id="receiver" class="gift-input" placeholder="e.g. Sarah" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="senderName"><i class="fas fa-user-circle"></i> Your Name</label>
-                    <input type="text" id="senderName" placeholder="Enter your name" required>
+                <div class="gift-input-group animate-slide-up" style="animation-delay: 0.2s;">
+                    <label>From (Your Name)</label>
+                    <input type="text" id="sender" class="gift-input" placeholder="e.g. Santa" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="message"><i class="fas fa-envelope"></i> Personal Message</label>
-                    <textarea id="message" rows="4" placeholder="Write a heartfelt message..." required></textarea>
+                <!-- Step 2: The Message -->
+                <div class="gift-input-group animate-slide-up" style="animation-delay: 0.3s;">
+                    <label>Your Message</label>
+                    <textarea id="message" class="gift-input" rows="4" placeholder="Write something heartwarming..."></textarea>
                 </div>
 
-                <div class="form-group">
-                    <label for="photo"><i class="fas fa-image"></i> Add a Photo (Optional)</label>
-                    <input type="file" id="photo" accept="image/*">
-                    <small>Upload a photo memory to include in the gift</small>
-                </div>
-
-                <div class="form-group">
-                    <label><i class="fas fa-microphone"></i> Voice Message (Optional)</label>
-                    <div class="voice-controls">
-                        <button id="recordBtn" class="btn-secondary">
-                            <i class="fas fa-microphone"></i> Record Message
-                        </button>
-                        <button id="stopBtn" class="btn-secondary" disabled>
-                            <i class="fas fa-stop"></i> Stop
-                        </button>
+                <!-- Step 3: Voice Message -->
+                <div class="gift-input-group animate-slide-up" style="animation-delay: 0.4s;">
+                    <label>Voice Message (Optional)</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="button" id="record-btn" class="btn-primary" style="background: var(--color-surface); border: 1px solid var(--color-accent);">🎙️ Record</button>
+                        <button type="button" id="stop-btn" class="btn-primary" style="background: var(--color-surface); display: none;">⏹️ Stop</button>
+                        <button type="button" id="play-btn" class="btn-primary" style="background: var(--color-surface); display: none;">▶️ Review</button>
                     </div>
-                    <audio id="audioPreview" controls style="display: none;"></audio>
+                    <p id="record-status" style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.6; min-height: 1.2em;"></p>
                 </div>
 
-                <div class="preview-section">
-                    <h3><i class="fas fa-eye"></i> Gift Preview</h3>
-                    <div class="gift-preview">
-          <div class="gift-preview">
-              <!-- 3D Gift Box Preview -->
-              <div class="gift-box">
-                  <div class="box">
-                      <div class="side front"></div>
-                      <div class="side back"></div>
-                      <div class="side left"></div>
-                      <div class="side right"></div>
-                      <div class="side top">
-                          <div class="ribbon-vertical"></div>
-                          <div class="ribbon-horizontal"></div>
-                          <div class="bow"></div>
-                      </div>
-                      <div class="side bottom"></div>
-                  </div>
-              </div>
-              <p class="preview-text">Click to see a preview!</p>
-          </div>
+                <!-- Step 4: Photos -->
+                <!-- Simplified for MVP: Single Photo or simple upload -->
+                <div class="gift-input-group animate-slide-up" style="animation-delay: 0.5s;">
+                    <label>Add a Photo (Optional)</label>
+                    <input type="file" id="photo-upload" accept="image/*" class="gift-input">
                 </div>
 
-                <div class="form-actions">
-                    <button id="createGiftBtn" class="btn-primary">
-                        <i class="fas fa-magic"></i> Create Gift
-                    </button>
-                    <button id="previewBtn" class="btn-secondary">
-                        <i class="fas fa-play"></i> Preview
-                    </button>
+                <!-- Submit -->
+                <div style="margin-top: 2rem;" class="animate-slide-up" style="animation-delay: 0.6s;">
+                    <button type="submit" id="create-btn" class="btn-primary">🎁 Create Magic Link</button>
                 </div>
-            </div>
+            </form>
 
-            <div class="instructions animate-slide-up delay-1">
-                <h3><i class="fas fa-info-circle"></i> How It Works</h3>
-                <ol>
-                    <li>Fill in the gift details above</li>
-                    <li>Add a photo or voice message (optional)</li>
-                    <li>Create your gift and share the link</li>
-                    <li>The recipient will experience an interactive gift opening</li>
-                </ol>
+            <div id="result-area" style="display: none; margin-top: 2rem;">
+                <p>Your gift is ready!</p>
+                <div class="gift-input" id="share-link" style="word-break: break-all; font-size: 0.9rem; margin: 1rem 0;"></div>
+                <button id="copy-btn" class="btn-primary">Copy Link</button>
+                <br><br>
+                <a href="#" id="preview-link" style="color: var(--color-accent);">Open Gift</a>
             </div>
         </main>
-
-        <footer class="footer">
-            <p>Made with <i class="fas fa-heart" style="color: #e74c3c;"></i> for Christmas</p>
-        </footer>
     </div>
 
-    <!-- Success Modal -->
-    <div id="successModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div class="modal-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h2>Gift Created Successfully!</h2>
-            <p>Your virtual Christmas gift is ready to share.</p>
-            <div class="share-options">
-                <input type="text" id="giftLink" readonly>
-                <button id="copyLink" class="btn-secondary">
-                    <i class="fas fa-copy"></i> Copy Link
-                </button>
-            </div>
-            <button id="openGiftBtn" class="btn-primary">
-                <i class="fas fa-box-open"></i> Open Gift Now
-            </button>
-        </div>
-    </div>
-
-    <script src="js/creategift.js"></script>
-    <script src="js/snowfall.js"></script>
-    <script src="js/voice.js"></script>
+    <!-- Logic -->
+    <script type="module" src="js/snowfall.js"></script>
+    <script type="module" src="js/creategift.js"></script>
 </body>
 </html>
